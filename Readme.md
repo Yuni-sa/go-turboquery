@@ -7,7 +7,7 @@ turboquery is a Go package that allows you to query multiple databases or replic
 To use turboquery in your Go project, you need to have Go installed and set up. Then, you can install the package using the following command:
 
 ```shell
-go get github.com/Yuni-sa/go-turboquery
+go get github.com/Yuni-sa/go-turboquery@v0.0.2
 ```
 
 ## Usage
