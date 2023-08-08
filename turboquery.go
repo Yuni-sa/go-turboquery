@@ -6,6 +6,11 @@ import (
 	"log"
 )
 
+type ReplicaInfo struct {
+	Name string
+	DSN  string
+}
+
 type Conn struct {
 	Name     string
 	Endpoint *sql.DB
@@ -17,7 +22,22 @@ type Result struct {
 	Rows         [][]string
 }
 
-func MultiQuery(conns []Conn, query string) Result {
+func MultiQuery(replicas []ReplicaInfo, query string) Result {
+	conns := make([]Conn, len(replicas))
+
+	for i, replica := range replicas {
+		db, err := sql.Open("mysql", replica.DSN)
+		if err != nil {
+			log.Fatalf("failed to connect to %s: %v", replica.Name, err)
+		}
+		defer db.Close()
+
+		conns[i] = Conn{
+			Name:     replica.Name,
+			Endpoint: db,
+		}
+	}
+
 	ctx, cancel := context.WithCancel(context.Background())
 
 	ch := make(chan Result, len(conns))

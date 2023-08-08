@@ -18,22 +18,15 @@ Here's an example of how to use turboquery with a mysql cluster:
 package main
 
 import (
-	"database/sql"
 	"fmt"
-	"log"
 
 	"github.com/Yuni-sa/go-turboquery"
 
 	_ "github.com/go-sql-driver/mysql"
 )
 
-type ReplicaInfo struct {
-	Name string
-	DSN  string
-}
-
 func main() {
-	replicas := []ReplicaInfo{
+	replicas := []turboquery.ReplicaInfo{
 		{
 			Name: "replica1",
 			DSN:  "replica1_connection_string",
@@ -45,23 +38,8 @@ func main() {
 		// Add more replicas as needed
 	}
 
-	conns := make([]turboquery.Conn, len(replicas))
-
-	for i, replica := range replicas {
-		db, err := sql.Open("mysql", replica.DSN)
-		if err != nil {
-			log.Fatalf("failed to connect to %s: %v", replica.Name, err)
-		}
-		defer db.Close()
-
-		conns[i] = turboquery.Conn{
-			Name:     replica.Name,
-			Endpoint: db,
-		}
-	}
-
 	query := "SELECT * FROM your_table"
-	result := turboquery.MultiQuery(conns, query)
+	result := turboquery.MultiQuery(replicas, query)
 
 	fmt.Println(result)
 }
